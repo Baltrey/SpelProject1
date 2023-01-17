@@ -1,35 +1,74 @@
-﻿using Raylib_cs;
-
+﻿global using System.Numerics;
+//saker för att sätta igång raylib
+global using Raylib_cs;
 Raylib.InitWindow(800, 600, "Game");
 Raylib.SetTargetFPS(60);
 
+//variabler för att karaktären ska gå utan att hålla ner en tagent
+bool KEYD = false;
+bool KEYA = false;
+bool KEYS = false;
+bool KEYW = false;
+int body = 0;
+Random generator = new Random();
+
+//laddar in texturerna
 Texture2D background = Raylib.LoadTexture("Grass_Type.png");
 Texture2D avatar = Raylib.LoadTexture("avatar.png");
-Texture2D bullet = Raylib.LoadTexture("bullet.png");
-Color hotpink = new Color(255, 105, 180, 255);
+Texture2D shell = Raylib.LoadTexture("shell.png");
+//hitboxes
 Rectangle playerRect = new Rectangle(0, 0, 64, 64);
-float speed = 5.5f;
+Rectangle shellRect = new Rectangle(50, 50, 64, 64);
+float speed = 4.5f;
 string currentscene = "start";
 while (Raylib.WindowShouldClose() == false)
 {
-
+    //logik så karaktären kan röra på sig
     if (currentscene == "game")
     {
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_D) || KEYD == true)
         {
-            playerRect.x += speed;
+            if (KEYA != true)
+            {
+                playerRect.x += speed;
+                KEYD = true;
+                KEYA = false;
+                KEYS = false;
+                KEYW = false;
+            }
         }
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_A) || KEYA == true)
         {
-            playerRect.x -= speed;
+            if (KEYD != true)
+            {
+                playerRect.x -= speed;
+                KEYD = false;
+                KEYA = true;
+                KEYS = false;
+                KEYW = false;
+            }
         }
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_S) || KEYS == true)
         {
-            playerRect.y += speed;
+            if (KEYW != true)
+            {
+                playerRect.y += speed;
+                KEYD = false;
+                KEYA = false;
+                KEYS = true;
+                KEYW = false;
+            }
         }
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_W) || KEYW == true)
         {
-            playerRect.y -= speed;
+            if (KEYS != true)
+            {
+                playerRect.y -= speed;
+                KEYD = false;
+                KEYA = false;
+                KEYS = false;
+                KEYW = true;
+            }
         }
     }
     else if (currentscene == "start")
@@ -40,10 +79,9 @@ while (Raylib.WindowShouldClose() == false)
         }
     }
 
-    //grafik
+    //grafik för de scener jag har
     Raylib.BeginDrawing();
     Raylib.ClearBackground(Color.WHITE);
-    //Raylib.DrawRectangle(350, 250, 100, 100, hotpink);
     if (currentscene == "game")
     {
         Raylib.DrawTexture(background, 0, 0, Color.WHITE);
@@ -51,18 +89,22 @@ while (Raylib.WindowShouldClose() == false)
             (int)playerRect.x,
             (int)playerRect.y,
             Color.WHITE);
-        if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
+        Raylib.DrawTexture(shell,
+            (int)shellRect.x,
+            (int)shellRect.y,
+            Color.WHITE);
+        if (Raylib.CheckCollisionRecs(playerRect, shellRect))
         {
-            Raylib.DrawTexture(bullet,
-                (int)playerRect.x + 55,
-                (int)playerRect.y + 25,
-                Color.WHITE
-            );
+            body++;
+            shellRect.x = generator.Next(0, 800);
+            shellRect.y = generator.Next(0, 600);
+
         }
+        Raylib.DrawText(("Body:" + body.ToString()), 0, 500, 20, Color.BLACK);
     }
     else if (currentscene == "start")
     {
-        Raylib.DrawText("Press ENTER to start", 50, 560, 50, Color.BLACK);
+        Raylib.DrawText("Press ENTER to start", 100, 250, 50, Color.BLACK);
     }
     else if (currentscene == "End")
     {
