@@ -70,8 +70,36 @@ while (Raylib.WindowShouldClose() == false)
                 KEYW = true;
             }
         }
+        //kollar om spelaren är utanför mapen
+        if (playerRect.x < 0 || playerRect.x > 800)
+        {
+            currentscene = "End";
+            playerRect.y = 0;
+            playerRect.x = 0;
+            KEYD = false;
+            KEYA = false;
+            KEYS = false;
+            KEYW = false;
+        }
+        if (playerRect.y < 0 || playerRect.y > 600)
+        {
+            currentscene = "End";
+            playerRect.y = 0;
+            playerRect.x = 0;
+            KEYD = false;
+            KEYA = false;
+            KEYS = false;
+            KEYW = false;
+        }
     }
     else if (currentscene == "start")
+    {
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+        {
+            currentscene = "game";
+        }
+    }
+    else if (currentscene == "End")
     {
         if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
         {
@@ -96,8 +124,8 @@ while (Raylib.WindowShouldClose() == false)
         if (Raylib.CheckCollisionRecs(playerRect, shellRect))
         {
             body++;
-            shellRect.x = generator.Next(0, 800);
-            shellRect.y = generator.Next(0, 600);
+            shellRect.x = generator.Next(50, 750);
+            shellRect.y = generator.Next(50, 550);
 
         }
         Raylib.DrawText(("Body:" + body.ToString()), 0, 500, 20, Color.BLACK);
@@ -108,7 +136,7 @@ while (Raylib.WindowShouldClose() == false)
     }
     else if (currentscene == "End")
     {
-        Raylib.DrawText("Game Over", 50, 560, 50, Color.RED);
+        Raylib.DrawText("Game Over", 150, 200, 100, Color.RED);
     }
     Raylib.EndDrawing();
 
